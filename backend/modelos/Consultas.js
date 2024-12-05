@@ -14,16 +14,20 @@ const Consultas = sequelize.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    idUsuario: {
+    usuarioId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    idMascota: {
+    mascotaId: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
     motivo: {
       type: DataTypes.STRING,
+      allowNull: false,
+    }, 
+    estado: {
+      type: DataTypes.BOOLEAN,
       allowNull: false,
     },
   },
