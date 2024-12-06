@@ -13,8 +13,8 @@ export default function App() {
     <NavigationContainer>
       <Tabs.Navigator
         initialRouteName="Bienvenida"
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ color, size }) => {
+        screenOptions={({ route }:any) => ({
+          tabBarIcon: ({ color, size }:any) => {
             let iconName;
 
             if (route.name === 'Bienvenida') {
