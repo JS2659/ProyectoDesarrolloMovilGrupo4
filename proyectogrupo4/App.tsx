@@ -5,6 +5,7 @@ import PantallaInicioSesion from './pantallas/PantallaInicioSesion';
 import PantallaBienvenida from './pantallas/PantallaBienvenida';
 import PantallaRegistro from './pantallas/PantallaRegistro';
 import { Ionicons } from 'react-native-vector-icons';
+import Citas from './pantallas/citas';
 
 const Tabs = createBottomTabNavigator();
 
@@ -44,8 +45,14 @@ export default function App() {
         <Tabs.Screen
           name="Registrarse"
           component={PantallaRegistro}
-          options={{ title: 'Registrarse' }}
+          options={{ title: 'Hacer Cita' }}
         />
+        <Tabs.Screen
+  name="Citas"
+  component={Citas}
+  options={{ title: 'Citas' }}
+/>
+
       </Tabs.Navigator>
     </NavigationContainer>
   );
