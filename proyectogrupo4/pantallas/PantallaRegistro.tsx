@@ -14,6 +14,7 @@ const PantallaRegistro = ({ navigation }: any) => {
     setFormulario({ ...formulario, [nombre]: valor });
   };
 
+
   const registrarConsulta = async () => {
     try {
       const respuesta = await fetch("http://localhost:3000/consultas", {
