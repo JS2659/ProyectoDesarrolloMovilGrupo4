@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -6,6 +7,9 @@ import PantallaBienvenida from './pantallas/PantallaBienvenida';
 import PantallaRegistro from './pantallas/PantallaRegistro';
 import { Ionicons } from 'react-native-vector-icons';
 import Citas from './pantallas/citas';
+import PantallaDetalles from './pantallas/PantallaDetalles';
+import PantallaListadoMascotas from './pantallas/PantallaListadoMascotas';
+import PantallaHistorialVacunas from './pantallas/PantallaHistorialVacunas';
 
 const Tabs = createBottomTabNavigator();
 
@@ -14,22 +18,30 @@ export default function App() {
     <NavigationContainer>
       <Tabs.Navigator
         initialRouteName="Bienvenida"
-        screenOptions={({ route }:any) => ({
-          tabBarIcon: ({ color, size }:any) => {
+        screenOptions={({ route }: any) => ({
+          tabBarIcon: ({ color, size }: any) => {
             let iconName;
 
             if (route.name === 'Bienvenida') {
-              iconName = 'home'; 
+              iconName = 'home';
             } else if (route.name === 'InicioSesion') {
-              iconName = 'log-in'; 
+              iconName = 'log-in';
             } else if (route.name === 'Registrarse') {
               iconName = 'person-add';
+            } else if (route.name === 'Detalles') {
+              iconName = 'information-circle';
+            } else if (route.name === 'ListadoMascotas') {
+              iconName = 'paw';
+            } else if (route.name === 'HistorialVacunas') {
+              iconName = 'medkit';
+            } else if (route.name === 'Citas') {
+              iconName = 'calendar';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
           },
           tabBarActiveTintColor: '#6200ee',
-          tabBarInactiveTintColor: 'gray', 
+          tabBarInactiveTintColor: 'gray',
         })}
       >
         <Tabs.Screen
@@ -48,12 +60,27 @@ export default function App() {
           options={{ title: 'Hacer Cita' }}
         />
         <Tabs.Screen
-  name="Citas"
-  component={Citas}
-  options={{ title: 'Citas' }}
-/>
-
+          name="Detalles"
+          component={PantallaDetalles}
+          options={{ title: 'Detalles' }}
+        />
+        <Tabs.Screen
+          name="ListadoMascotas"
+          component={PantallaListadoMascotas}
+          options={{ title: 'Mascotas' }}
+        />
+        <Tabs.Screen
+          name="HistorialVacunas"
+          component={PantallaHistorialVacunas}
+          options={{ title: 'Historial Vacunas' }}
+        />
+        <Tabs.Screen
+          name="Citas"
+          component={Citas}
+          options={{ title: 'Citas' }}
+        />
       </Tabs.Navigator>
     </NavigationContainer>
   );
 }
+
