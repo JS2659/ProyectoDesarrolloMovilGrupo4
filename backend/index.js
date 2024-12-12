@@ -8,6 +8,8 @@ const Usuario = require('./modelos/Usuario')
 const app = express()
 app.use(express.json())
 app.use(cors())
+app.use(express.urlencoded({ extended: true }));
+
 
 app.get('/usuario', async (req,res)=>{
     try {
@@ -35,6 +37,34 @@ app.get('/login', async(req,res)=>{
         res.status(500).json({error: 'Ocurrio un error:' + error})
     }
 })
+
+
+app.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body; // Extraemos email y password del cuerpo de la solicitud.
+
+        // Buscamos el usuario en la base de datos con las credenciales proporcionadas.
+        const usuario = await Usuario.findAll({
+            where: {
+                email: email,
+                password: password
+            }
+        });
+
+        // Verificamos si se encontró algún usuario.
+        if (usuario.length > 0) {
+            res.status(200).json(usuario); // Si el usuario existe, lo devolvemos.
+        } else {
+            res.status(404).json({ mensaje: 'Correo o contraseña incorrectos' }); // Si no existe, devolvemos un mensaje de error.
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Ocurrió un error: ' + error.message }); // En caso de error en el servidor, enviamos un mensaje.
+    }
+});
+
+
+
+
 
 app.post('/usuario', async(req,res)=>{
     try {
@@ -81,53 +111,47 @@ app.delete("/usuario/:idUsuario", async (req, res) => {
     }
   });
 
-app.get("/consultas/:idUsuario", async(req,res)=>{
+
+
+
+
+// Endpoint GET para obtener todas las consultas
+app.get("/consultas", async (req, res) => {
     try {
-        const consultas = await Consultas.findAll({
-            where:{ usuarioId: req.params.idUsuario, estado : false }
-        })
-        res.status(200).json(consultas)
+      const consultas = await Consultas.findAll(); // Obtener todas las consultas
+      res.status(200).json(consultas); // Enviar la lista de consultas
     } catch (error) {
-        res.status(500).json({ error: "Ocurrio un error" + error });
+      console.error(error);
+      res.status(500).json({ error: "Error al obtener las consultas" });
     }
-})
-
-app.put("/consultas/:idConsulta", async(req,res)=>{
+  });
+  
+  // Endpoint POST para crear una nueva consulta
+  app.post("/consultas", async (req, res) => {
+    const { fecha, usuarioId, mascotaId, motivo, estado } = req.body;
+  
+    // Validación de los datos requeridos
+    if (!fecha || !usuarioId || !motivo || estado === undefined) {
+      return res.status(400).json({ error: "Faltan datos requeridos" });
+    }
+  
     try {
-        const updated = await Consultas.update(req.body,{where:{ id: req.params.idConsulta}})
-        if (updated) {
-            res.status(201).json({ mensaje: "Consulta actualizada correctamente" });
-          } else {
-            res.status(400).json({ mensaje: "no se actualizo" });
-          }
-
+      // Crear una nueva consulta usando el modelo Consultas
+      const nuevaConsulta = await Consultas.create({
+        fecha,
+        usuarioId,
+        mascotaId,
+        motivo,
+        estado,
+      });
+      res.status(201).json(nuevaConsulta); // Enviar la consulta creada
     } catch (error) {
-        res.status(500).json({ error: "Ocurrio un error" + error });
+      console.error(error);
+      res.status(500).json({ error: "Error al crear la consulta" });
     }
-})
+  });
 
-app.post("/consultas", async(req,res)=>{
-    try {        
-        const consulta = await Consultas.create(req.body)
-        res.status(201).json({ mensaje: "consulta creada con exito" });
-    } catch (error) {
-        res.status(500).json({ error: "Ocurrio un error" + error });
-    }
-})
 
-app.delete("/consultas/:idConsulta", async(req,res)=>{
-    try {
-        const updated = await Consultas.destroy({where:{ id: req.params.idConsulta}})
-        if (updated) {
-            res.status(201).json({ mensaje: "Consulta Eliminada correctamente" });
-          } else {
-            res.status(400).json({ mensaje: "no se elimino" });
-          }
-
-    } catch (error) {
-        res.status(500).json({ error: "Ocurrio un error" + error });
-    }
-})
 
 app.get("/mascotas/:idUsuario",async(req,res)=>{
     try {
@@ -146,6 +170,13 @@ app.post("/mascotas", async(req,res)=>{
         res.status(500).json({ error: "Ocurrio un error" + error });
     }
 })
+
+
+
+
+
+
+
 
 app.put("/mascotas/:idMascota", async(req,res)=>{
     try {

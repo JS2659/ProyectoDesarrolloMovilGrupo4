@@ -6,9 +6,14 @@ const PantallaLogin = ({ navigation }: any) => {
   const [contrasena, setContrasena] = useState<string>("");
 
   const manejarInicioSesion = async () => {
+    if (!correo || !contrasena) {
+      Alert.alert("Error", "Por favor, ingrese su correo y contraseña.");
+      return;
+    }
+
     try {
-      const respuesta = await fetch("http://localhost:3000/login", {
-        method: "GET",
+      const respuesta = await fetch("http://localhost:5000/login", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -18,17 +23,17 @@ const PantallaLogin = ({ navigation }: any) => {
         }),
       });
 
-      const datos = await respuesta.json();
-
-      if (respuesta.status === 200) {
-        Alert.alert("Éxito", "Inicio de sesión exitoso");
-        navigation.navigate("Citas", { usuarioId: datos[0]?.id });
-      } else {
-        Alert.alert("Error", datos.mensaje || "Correo o contraseña incorrectos");
+      if (!respuesta.ok) {
+        const datosError = await respuesta.json();
+        throw new Error(datosError.mensaje || "Correo o contraseña incorrectos");
       }
+
+      const datos = await respuesta.json();
+      Alert.alert("Éxito", "Inicio de sesión exitoso");
+      navigation.navigate("Citas", { usuarioId: datos[0]?.id });
     } catch (error: unknown) {
       if (error instanceof Error) {
-        Alert.alert("Error", "Ocurrió un error: " + error.message);
+        Alert.alert("Error", error.message);
       } else {
         Alert.alert("Error", "Ocurrió un error inesperado");
       }
@@ -45,6 +50,7 @@ const PantallaLogin = ({ navigation }: any) => {
         keyboardType="email-address"
         value={correo}
         onChangeText={setCorreo}
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
@@ -63,11 +69,14 @@ const styles = StyleSheet.create({
   contenedor: {
     flex: 1,
     padding: 20,
+    justifyContent: "center",
+    backgroundColor: "#f5f5f5",
   },
   titulo: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+    textAlign: "center",
   },
   input: {
     borderWidth: 1,
@@ -75,6 +84,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
+    backgroundColor: "#fff",
   },
 });
 
