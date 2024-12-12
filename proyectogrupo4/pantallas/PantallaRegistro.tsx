@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
 import api from "../services/api";
+import { useContexVet } from "../contexto/ProviderVet";
 
 const PantallaRegistro = ({ navigation }: any) => {
+  const {setUsuarioId} = useContexVet()
   const [nombreCompleto, setNombreCompleto] = useState("")
   const [DNI, setDNI] = useState("")
   const [email, setEmail] = useState("")
@@ -22,11 +24,12 @@ const PantallaRegistro = ({ navigation }: any) => {
           password: password        
       }
       await api.post('/usuario', nuevoUsuario).then((response)=>{
-        Alert.alert("Éxito", "Regitrado Con Exito");
-        //@ts-ignore
-        navigation.navigate("Citas", { usuarioId: response.data[0].id });
+        console.log(response.data)
+        setUsuarioId(response.data.id)       
+        
+        navigation.navigate("Citas", { usuarioId: response.data.id });
       }).catch((error)=>{
-        Alert.alert("Error", error || "Ocurrió un error al registrar");
+        Alert.alert("Error", error.toString() || "Ocurrió un error al registrar");
       })    
 
     } catch (error) {
