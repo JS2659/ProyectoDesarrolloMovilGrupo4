@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert, Button } from 'react-native';
 import axios from 'axios';
+import { useContexVet } from '../contexto/ProviderVet';
+import api from '../services/api';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 interface Consulta {
@@ -10,15 +13,17 @@ interface Consulta {
   estado: boolean;
   usuarioId: number;
 }
-export default function Citas({ route }: any) {
-  const { idUsuario } = route.params;
+export default function Citas({ navigation }: any) {
+
+  
+  const { usuarioId } = useContexVet();
 
   const [consultas, setConsultas] = useState<Consulta[]>([]);
 
   useEffect(() => {
     const fetchConsultas = async () => {
       try {
-        const response = await axios.get(`/consultas/${idUsuario}`);
+        const response = await api.get(`/consultas/${usuarioId}`);
         setConsultas(response.data); 
       } catch (error) {
         console.error(error);
@@ -27,11 +32,11 @@ export default function Citas({ route }: any) {
     };
 
     fetchConsultas();
-  }, [idUsuario]);
+  }, []);
 
   const actualizarConsulta = async (idConsulta: number) => {
     try {
-      const response = await axios.put(`/consultas/${idConsulta}`, {
+      const response = await api.put(`/consultas/${idConsulta}`, {
         estado: true,
       });
       Alert.alert('Éxito', response.data.mensaje);

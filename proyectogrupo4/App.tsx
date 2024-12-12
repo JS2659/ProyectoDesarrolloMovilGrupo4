@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import PantallaInicioSesion from './pantallas/PantallaInicioSesion';
@@ -10,12 +10,14 @@ import Citas from './pantallas/citas';
 import PantallaDetalles from './pantallas/PantallaDetalles';
 import PantallaListadoMascotas from './pantallas/PantallaListadoMascotas';
 import PantallaHistorialVacunas from './pantallas/PantallaHistorialVacunas';
+import ProviderVet from './contexto/ProviderVet';
 
 const Tabs = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
+    <ProviderVet>
+      <NavigationContainer>
       <Tabs.Navigator
         initialRouteName="Bienvenida"
         screenOptions={({ route }: any) => ({
@@ -46,8 +48,8 @@ export default function App() {
       >
         <Tabs.Screen
           name="Bienvenida"
-          component={PantallaBienvenida}
-          options={{ title: 'Inicio' }}
+          component={PantallaBienvenida}          
+          options={{title: 'Inicio'}}        
         />
         <Tabs.Screen
           name="InicioSesion"
@@ -57,12 +59,12 @@ export default function App() {
         <Tabs.Screen
           name="Registrarse"
           component={PantallaRegistro}
-          options={{ title: 'Hacer Cita' }}
+          options={{ title: 'Registro' }}
         />
         <Tabs.Screen
           name="Detalles"
           component={PantallaDetalles}
-          options={{ title: 'Detalles' }}
+          options={{ title: 'Detalles'}}
         />
         <Tabs.Screen
           name="ListadoMascotas"
@@ -81,6 +83,8 @@ export default function App() {
         />
       </Tabs.Navigator>
     </NavigationContainer>
+    </ProviderVet>
+    
   );
 }
 

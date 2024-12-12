@@ -3,7 +3,7 @@ const Sequelize = require('sequelize')
 const sequelize = new Sequelize(
     'proyectodesarrollomovil',
     'root',
-    'L0renzana2811@',
+    'MySecretPassword',
 
     {
         host: process.env.host,

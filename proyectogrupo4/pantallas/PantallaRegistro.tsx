@@ -36,7 +36,7 @@ const PantallaRegistro = ({ navigation }: any) => {
 
   return (
     <View style={styles.contenedor}>
-      <Text style={styles.titulo}>Programar Consulta</Text>
+      <Text style={styles.titulo}>Registro</Text>
 
       <TextInput
         style={styles.input}

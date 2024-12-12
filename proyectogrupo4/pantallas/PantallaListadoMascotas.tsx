@@ -1,33 +1,34 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, Alert, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Alert, FlatList, Button } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import api from '../services/api';
+import { useContexVet } from '../contexto/ProviderVet';
 
 interface Mascota {
  
   id: number;
   nombre: string;
   descripcion: string;
-  
 }
 
-const PantallaListadoMascotas = ({ navegación }: any) => {
+export default function PantallaListadoMascotas({ navigation }: any) {
+  const {usuarioId, setMascotaId} = useContexVet()
   const [mascotas, setMascotas] = useState<Mascota[]>([]);
 
+  const verMascota = (mascotaId:number) =>{
+    setMascotaId(mascotaId)
+    navigation.navigate('Detalles')
+  }
+ 
   const obtenerMascotas = async () => {
+ 
     try {
-      const respuesta = await fetch("http://localhost:3000/mascotas", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const datos: Mascota[] = await respuesta.json(); 
-
-      if (respuesta.status === 200) {
-        setMascotas(datos);
-      } else {
-        Alert.alert("Error", datos.error || "Ocurrió un error al obtener las mascotas");
-      }
+      await api.get(`/mascotasporusuario/${usuarioId}`).then((response)=>{
+        const datos: Mascota[] = response.data;
+        setMascotas(datos); 
+      }).catch((error)=>{
+        Alert.alert("Error", error || "Ocurrió un error al obtener las mascotas");
+      })
+     
     } catch (error) {
       Alert.alert("Error", "Ocurrió un error: " + error);
     }
@@ -47,13 +48,16 @@ const PantallaListadoMascotas = ({ navegación }: any) => {
           <View style={styles.item}>
             <Text style={styles.nombre}>{item.nombre}</Text>
             <Text style={styles.descripcion}>{item.descripcion}</Text>
+            <Button title='Ver Detalles' onPress={()=>verMascota(item.id)}></Button>
           </View>
         )}
         keyExtractor={(item) => item.id.toString()}
       />
     </View>
   );
-};
+}
+
+
 
 
 const styles = StyleSheet.create({
@@ -79,5 +83,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-export default PantallaListadoMascotas;

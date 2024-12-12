@@ -22,7 +22,6 @@ app.get('/usuario', async (req,res)=>{
 
 app.get('/login/:correo/:password', async(req,res)=>{
     try {
-        console.log(req.params.correo, req.params.password)
         const Email = req.params.correo
         const Password = req.params.password
         const usuario = await Usuario.findAll({where:{
@@ -51,7 +50,6 @@ app.post('/login', async (req, res) => {
                 password: password
             }
         });
-
         // Verificamos si se encontró algún usuario.
         if (usuario.length > 0) {
             res.status(200).json(usuario); // Si el usuario existe, lo devolvemos.
@@ -62,10 +60,6 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ error: 'Ocurrió un error: ' + error.message }); // En caso de error en el servidor, enviamos un mensaje.
     }
 });
-
-
-
-
 
 app.post('/usuario', async(req,res)=>{
     try {
@@ -112,14 +106,13 @@ app.delete("/usuario/:idUsuario", async (req, res) => {
     }
   });
 
-
-
-
-
 // Endpoint GET para obtener todas las consultas
-app.get("/consultas", async (req, res) => {
+app.get("/consultas/:usuarioId", async (req, res) => {
     try {
-      const consultas = await Consultas.findAll(); // Obtener todas las consultas
+      const usuarioId = req.params.usuarioId
+      const consultas = await Consultas.findAll({where:{
+        usuarioId:usuarioId
+      }}); // Obtener todas las consultas
       res.status(200).json(consultas); // Enviar la lista de consultas
     } catch (error) {
       console.error(error);
@@ -153,10 +146,18 @@ app.get("/consultas", async (req, res) => {
   });
 
 
-
-app.get("/mascotas/:idUsuario",async(req,res)=>{
+app.get("/mascotasporusuario/:idUsuario",async(req,res)=>{
     try {
         const mascotas = await Mascotas.findAll({where: { idUsuario: req.params.idUsuario }})
+        res.status(200).json(mascotas)
+    } catch (error) {
+        res.status(500).json({ error: "Ocurrio un error" + error });
+    }
+})
+
+app.get("/mascotas/:id",async(req,res)=>{
+    try {
+        const mascotas = await Mascotas.findAll({where: { id: req.params.id }})
         res.status(200).json(mascotas)
     } catch (error) {
         res.status(500).json({ error: "Ocurrio un error" + error });
@@ -171,13 +172,6 @@ app.post("/mascotas", async(req,res)=>{
         res.status(500).json({ error: "Ocurrio un error" + error });
     }
 })
-
-
-
-
-
-
-
 
 app.put("/mascotas/:idMascota", async(req,res)=>{
     try {

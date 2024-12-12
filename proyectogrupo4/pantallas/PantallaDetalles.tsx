@@ -1,33 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Alert, StyleSheet } from 'react-native';
+import { useContexVet } from '../contexto/ProviderVet';
+import api from '../services/api';
 
 interface Mascota {
   error: string;
   nombre: string;
-  descripcion: string;
+  especie: string;
   edad: number;
-  raza: string;
+  peso: string;
 }
 
 const PantallaDetalles: React.FC<{ navegación: any; ruta: any }> = ({ navegación, ruta }) => {
   const [mascota, setMascota] = useState<Mascota | null>(null);
-
+  const {mascotaId} = useContexVet()
   const obtenerMascota = async () => {
     try {
-      const respuesta = await fetch(`http://localhost:3000/mascotas/${ruta.params.id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const datos: Mascota = await respuesta.json();
-
-      if (respuesta.status === 200) {
+      await api.get(`/mascotas/${mascotaId}`).then((response)=>{
+        const datos: Mascota = response.data[0]
         setMascota(datos);
-      } else {
-        Alert.alert('Error', datos.error || 'Ocurrió un error al obtener la mascota');
-      }
+      }).catch((error)=>{
+        Alert.alert('Error', error || 'Ocurrió un error al obtener la mascota');
+      })
+     
     } catch (error) {
       Alert.alert('Error', 'Ocurrió un error: ' + error);
     }
@@ -43,10 +38,10 @@ const PantallaDetalles: React.FC<{ navegación: any; ruta: any }> = ({ navegaci�
 
       {mascota ? (
         <>
-          <Text style={styles.nombre}>{mascota.nombre}</Text>
-          <Text style={styles.descripcion}>{mascota.descripcion}</Text>
-          <Text style={styles.edad}>{mascota.edad} años</Text>
-          <Text style={styles.raza}>{mascota.raza}</Text>
+          <Text style={styles.nombre}>Nombre de mi mascota: {mascota.nombre}</Text>
+          <Text style={styles.descripcion}>Mi mascota es un: {mascota.especie}</Text>
+          <Text style={styles.edad}>Tiene: {mascota.edad} años de edad</Text>
+          <Text style={styles.raza}>Pesa: {mascota.peso} Kg</Text>
         </>
       ) : (
         <Text>Cargando...</Text>

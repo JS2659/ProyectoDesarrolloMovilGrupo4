@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
 import api from "../services/api";
+import { useContexVet } from "../contexto/ProviderVet";
 
 const PantallaLogin = ({ navigation }: any) => {
+  const {usuarioId, setUsuarioId} = useContexVet()
   const [correo, setCorreo] = useState<string>("");
   const [contrasena, setContrasena] = useState<string>("");
 
@@ -21,8 +23,8 @@ const PantallaLogin = ({ navigation }: any) => {
       await api.get(`/login/${credenciales.email}/${credenciales.password}`).then((response)=>{
         if (response.status === 200) {
           Alert.alert("Éxito", "Inicio de sesión exitoso");
-          console.log(response.data)
-          navigation.navigate("Citas", { usuarioId: response.data[0]?.id });
+          setUsuarioId(response.data[0]?.id)
+          navigation.navigate("Citas");
         } else {
           Alert.alert("Error", response.statusText || "Correo o contraseña incorrectos");
         }
