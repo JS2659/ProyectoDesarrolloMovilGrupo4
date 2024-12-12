@@ -18,10 +18,11 @@ app.get('/usuario', async (req,res)=>{
     }
 })
 
-app.get('/login', async(req,res)=>{
+app.get('/login/:correo/:password', async(req,res)=>{
     try {
-        const Email = req.body.email
-        const Password = req.body.password
+        console.log(req.params.correo, req.params.password)
+        const Email = req.params.correo
+        const Password = req.params.password
         const usuario = await Usuario.findAll({where:{
             email:Email,
             password: Password
@@ -40,7 +41,7 @@ app.post('/usuario', async(req,res)=>{
     try {
         
         const usuario = await Usuario.create(req.body)
-        res.status(201).json({ mensaje: "usuario creado con exito" });
+        res.status(201).json(usuario);
 
     } catch (error) {
         res.status(500).json({error: 'Ocurrio un error:' + error})

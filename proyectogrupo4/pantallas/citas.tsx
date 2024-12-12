@@ -18,7 +18,7 @@ export default function Citas({ route }: any) {
   useEffect(() => {
     const fetchConsultas = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/consultas/${idUsuario}`);
+        const response = await axios.get(`/consultas/${idUsuario}`);
         setConsultas(response.data); 
       } catch (error) {
         console.error(error);
@@ -31,7 +31,7 @@ export default function Citas({ route }: any) {
 
   const actualizarConsulta = async (idConsulta: number) => {
     try {
-      const response = await axios.put(`http://localhost:3000/consultas/${idConsulta}`, {
+      const response = await axios.put(`/consultas/${idConsulta}`, {
         estado: true,
       });
       Alert.alert('Éxito', response.data.mensaje);
