@@ -1,88 +1,73 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, Alert, Button } from 'react-native';
+import axios from 'axios';
 
+
+interface Consulta {
+  id: number;
+  fecha: string;
+  motivo: string;
+  estado: boolean;
+  usuarioId: number;
+}
 export default function Citas({ route }: any) {
   const { idUsuario } = route.params;
 
-  const [fecha, setFecha] = useState('');
-  const [mascotaId, setMascotaId] = useState('');
-  const [motivo, setMotivo] = useState('');
-  const [estado, setEstado] = useState(true); // Valor por defecto para 'estado' es true
+  const [consultas, setConsultas] = useState<Consulta[]>([]);
 
-  const enviarConsulta = async () => {
-    if (!fecha || !mascotaId || !motivo) {
-      Alert.alert('Error', 'Por favor, ingrese todos los campos.');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:5000/consultas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          usuarioId: idUsuario,  // Tomado desde los parámetros
-          fecha: fecha,
-          mascotaId: mascotaId,
-          motivo: motivo,
-          estado: estado,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error en la solicitud');
+  useEffect(() => {
+    const fetchConsultas = async () => {
+      try {
+        const response = await axios.get(`/consultas/${idUsuario}`);
+        setConsultas(response.data); 
+      } catch (error) {
+        console.error(error);
+        Alert.alert('Error', 'No se pudieron cargar las consultas.');
       }
+    };
 
-      const data = await response.json();
+    fetchConsultas();
+  }, [idUsuario]);
 
-      Alert.alert('Éxito', 'Consulta registrada correctamente.');
-      // Limpiar los campos después de enviar
-      setFecha('');
-      setMascotaId('');
-      setMotivo('');
-      setEstado(true);  // Restaurar el valor por defecto
+  const actualizarConsulta = async (idConsulta: number) => {
+    try {
+      const response = await axios.put(`/consultas/${idConsulta}`, {
+        estado: true,
+      });
+      Alert.alert('Éxito', response.data.mensaje);
+      setConsultas((prev) =>
+        prev.map((consulta) =>
+          consulta.id === idConsulta ? { ...consulta, estado: true } : consulta
+        )
+      );
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'No se pudo registrar la consulta.');
+      Alert.alert('Error', 'No se pudo actualizar la consulta.');
     }
   };
 
+  const renderConsulta = ({ item }: { item: Consulta }) => (
+    <View style={styles.card}>
+      <Text style={styles.texto}>Fecha: {item.fecha}</Text>
+      <Text style={styles.texto}>Motivo: {item.motivo}</Text>
+      <Text style={styles.texto}>Estado: {item.estado ? 'Atendida' : 'Pendiente'}</Text>
+      {!item.estado && (
+        <Button title="Marcar como atendida" onPress={() => actualizarConsulta(item.id)} />
+      )}
+    </View>
+  );
+
   return (
     <View style={styles.contenedor}>
-      <Text style={styles.titulo}>Nueva Consulta</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Fecha (YYYY-MM-DD HH:mm:ss)"
-        value={fecha}
-        onChangeText={setFecha}
+      <Text style={styles.titulo}>Consultas Pendientes</Text>
+      <FlatList
+        data={consultas}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderConsulta}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="ID de Mascota"
-        value={mascotaId}
-        onChangeText={setMascotaId}
-        keyboardType="numeric"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Motivo"
-        value={motivo}
-        onChangeText={setMotivo}
-      />
-      
-      {/* El campo de Estado puede ser un checkbox o un switch */}
-      <View style={styles.estadoContainer}>
-        <Text>Estado: {estado ? 'Atendida' : 'Pendiente'}</Text>
-        <Button title={`Marcar como ${estado ? 'Pendiente' : 'Atendida'}`} onPress={() => setEstado(!estado)} />
-      </View>
-
-      <Button title="Registrar Consulta" onPress={enviarConsulta} />
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   contenedor: {
     flex: 1,
@@ -95,16 +80,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  input: {
+  card: {
     width: '100%',
-    padding: 10,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: '#f8f9fa',
+    padding: 15,
+    marginBottom: 10,
     borderRadius: 5,
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
-  estadoContainer: {
-    marginBottom: 15,
-    alignItems: 'center',
+  texto: {
+    fontSize: 16,
   },
 });

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
+import api from "../services/api";
 
 const PantallaLogin = ({ navigation }: any) => {
   const [correo, setCorreo] = useState<string>("");
@@ -12,25 +13,22 @@ const PantallaLogin = ({ navigation }: any) => {
     }
 
     try {
-      const respuesta = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: correo,
-          password: contrasena,
-        }),
-      });
 
-      if (!respuesta.ok) {
-        const datosError = await respuesta.json();
-        throw new Error(datosError.mensaje || "Correo o contraseña incorrectos");
+      const credenciales = {
+        email: correo,
+        password: contrasena,
       }
+      await api.get(`/login/${credenciales.email}/${credenciales.password}`).then((response)=>{
+        if (response.status === 200) {
+          Alert.alert("Éxito", "Inicio de sesión exitoso");
+          console.log(response.data)
+          navigation.navigate("Citas", { usuarioId: response.data[0]?.id });
+        } else {
+          Alert.alert("Error", response.statusText || "Correo o contraseña incorrectos");
+        }
+      })
+      
 
-      const datos = await respuesta.json();
-      Alert.alert("Éxito", "Inicio de sesión exitoso");
-      navigation.navigate("Citas", { usuarioId: datos[0]?.id });
     } catch (error: unknown) {
       if (error instanceof Error) {
         Alert.alert("Error", error.message);
